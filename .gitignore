@@ -1,0 +1,31 @@
+# Build outputs
+.ufbt/
+dist/debug/
+*.o
+*.d
+
+# Dev / test scripts
+dev_loop.py
+dev_loop_logs/
+capture_logs.py
+dtr_reset.py
+exit_log_mode.py
+flash_fap.py
+pi_brute_monitor.py
+pi_sato/
+probe*.py
+probe_loader.py
+push_fap.py
+run_test.py
+sgd_query.py
+test_kill_pw.py
+test_qr_scene.py
+ymr100_debug_controller.py
+sato_pw_extract.txt
+
+# Misc
+*.pyc
+__pycache__/
+.DS_Store
+Thumbs.db
+bulkwriter_readme_ref.txt

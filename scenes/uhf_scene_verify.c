@@ -4,7 +4,8 @@ bool verify_success = false;
 FuriString* temp_str;
 
 void uhf_scene_verify_callback_event(UHFWorkerEvent event, void* ctx) {
-    UNUSED(ctx);
+    /* Bug fix: original had UNUSED(ctx) then used ctx — UNUSED is (void)(x)
+     * which is harmless but incorrect documentation. Removed. */
     UHFApp* uhf_app = ctx;
     if(event == UHFWorkerEventSuccess) verify_success = true;
 
@@ -39,6 +40,9 @@ bool uhf_scene_verify_on_event(void* ctx, SceneManagerEvent event) {
             consumed = true;
         } else if(event.event == GuiButtonTypeLeft) {
             if(!verify_success) {
+                /* Bug fix: reset verify_success before restarting the worker so
+                 * a stale true value from a previous session can't mask failure. */
+                verify_success = false;
                 widget_reset(uhf_app->widget);
                 furi_string_reset(temp_str);
                 uhf_worker_stop(uhf_app->worker);

@@ -5,10 +5,11 @@ void uhf_read_tag_worker_callback(UHFWorkerEvent event, void* ctx) {
     UHFApp* uhf_app = ctx;
     if(event == UHFWorkerEventSuccess) {
         view_dispatcher_send_custom_event(uhf_app->view_dispatcher, UHFCustomEventWorkerExit);
+    } else {
+        /* Bug fix: failure was silently ignored, leaving the popup stuck forever.
+         * Signal failure so on_event can navigate the user back. */
+        view_dispatcher_send_custom_event(uhf_app->view_dispatcher, UHFCustomEventWorkerFail);
     }
-    // } else if(event == UHFWorkerEventAborted) {
-    //     scene_manager_search_and_switch_to_previous_scene(uhf_app->scene_manager, UHFSceneStart);
-    // }
 }
 
 void uhf_scene_read_tag_on_enter(void* ctx) {
@@ -31,9 +32,15 @@ void uhf_scene_read_tag_on_enter(void* ctx) {
 bool uhf_scene_read_tag_on_event(void* ctx, SceneManagerEvent event) {
     UHFApp* uhf_app = ctx;
     bool consumed = false;
-    if(event.event == UHFCustomEventWorkerExit) {
-        scene_manager_next_scene(uhf_app->scene_manager, UHFSceneReadTagSuccess);
-        consumed = true;
+    if(event.type == SceneManagerEventTypeCustom) {
+        if(event.event == UHFCustomEventWorkerExit) {
+            scene_manager_next_scene(uhf_app->scene_manager, UHFSceneReadTagSuccess);
+            consumed = true;
+        } else if(event.event == UHFCustomEventWorkerFail) {
+            notification_message(uhf_app->notifications, &sequence_error);
+            consumed = scene_manager_search_and_switch_to_previous_scene(
+                uhf_app->scene_manager, UHFSceneStart);
+        }
     }
     return consumed;
 }

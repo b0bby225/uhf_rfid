@@ -1,6 +1,12 @@
 #include "../uhf_app_i.h"
 
-enum SubmenuIndex { SubmenuIndexRead, SubmenuIndexSaved, SubmenuIndexSettings };
+enum SubmenuIndex {
+    SubmenuIndexRead,
+    SubmenuIndexSaved,
+    SubmenuIndexSettings,
+    SubmenuIndexBulkScan,
+    SubmenuIndexBruteForce,
+};
 
 void uhf_scene_start_submenu_callback(void* ctx, uint32_t index) {
     UHFApp* uhf_app = ctx;
@@ -15,6 +21,10 @@ void uhf_scene_start_on_enter(void* ctx) {
         submenu, "Read Tag", SubmenuIndexRead, uhf_scene_start_submenu_callback, uhf_app);
     submenu_add_item(
         submenu, "Saved", SubmenuIndexSaved, uhf_scene_start_submenu_callback, uhf_app);
+    submenu_add_item(
+        submenu, "Bulk Scan", SubmenuIndexBulkScan, uhf_scene_start_submenu_callback, uhf_app);
+    submenu_add_item(
+        submenu, "Kill PW Audit", SubmenuIndexBruteForce, uhf_scene_start_submenu_callback, uhf_app);
     submenu_add_item(
         submenu, "Settings", SubmenuIndexSettings, uhf_scene_start_submenu_callback, uhf_app);
 
@@ -32,20 +42,26 @@ bool uhf_scene_start_on_event(void* ctx, SceneManagerEvent event) {
             scene_manager_next_scene(uhf_app->scene_manager, UHFSceneReadTag);
             consumed = true;
         } else if(event.event == SubmenuIndexSaved) {
-            // Explicitly save state so that the correct item is
-            // reselected if the user cancels loading a file.
             scene_manager_set_scene_state(
                 uhf_app->scene_manager, UHFSceneStart, SubmenuIndexSaved);
             scene_manager_next_scene(uhf_app->scene_manager, UHFSceneFileSelect);
             consumed = true;
+        } else if(event.event == SubmenuIndexSettings) {
+            scene_manager_set_scene_state(
+                uhf_app->scene_manager, UHFSceneStart, SubmenuIndexSettings);
+            scene_manager_next_scene(uhf_app->scene_manager, UHFSceneSettings);
+            consumed = true;
+        } else if(event.event == SubmenuIndexBulkScan) {
+            scene_manager_set_scene_state(
+                uhf_app->scene_manager, UHFSceneStart, SubmenuIndexBulkScan);
+            scene_manager_next_scene(uhf_app->scene_manager, UHFSceneBulkScan);
+            consumed = true;
+        } else if(event.event == SubmenuIndexBruteForce) {
+            scene_manager_set_scene_state(
+                uhf_app->scene_manager, UHFSceneStart, SubmenuIndexBruteForce);
+            scene_manager_next_scene(uhf_app->scene_manager, UHFSceneBruteForce);
+            consumed = true;
         }
-        // } else if(event.event == SubmenuIndexEliteDictAttack) {
-        //     scene_manager_set_scene_state(
-        //         uhf_app->scene_manager, UHFSceneStart, SubmenuIndexEliteDictAttack);
-        //     scene_manager_next_scene(uhf_app->scene_manager, UHFSceneEliteDictAttack);
-        //     consumed = true;
-        // }
-        // consumed = true;
     }
     return consumed;
 }

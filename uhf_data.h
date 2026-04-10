@@ -41,6 +41,8 @@ typedef struct UHFTag {
     // USER Bank
     uint8_t user[MAX_BANK_SIZE]; // 0x00-END
     size_t user_length;
+    // Security passwords (scene → worker scratch buffer)
+    uint8_t security_password[4]; // shared 4-byte slot for access/kill pw ops
 } UHFTag;
 
 UHFData* uhf_data_alloc();

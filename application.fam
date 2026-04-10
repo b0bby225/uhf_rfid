@@ -8,16 +8,17 @@ App(
         "storage",
         "gui",
     ],
-    stack_size=4 * 1024,
+    stack_size=8 * 1024,
     order=30,
-    # fap_icon="125_10px.png",
     fap_category="RFID",
-    # fap_libs=["mbedtls"],
-    # fap_private_libs=[
-    #     Lib(
-    #         name="loclass",
-    #     ),
-    # ],
+    fap_private_libs=[
+        Lib(
+            name="qrcode",
+            sources=["qrcode.c"],
+            cflags=["-Wno-unknown-pragmas", "-Wno-type-limits"],
+        ),
+    ],
+    fap_icon="uhf_rfid_icon.png",
     fap_icon_assets="icons",
     fap_icon_assets_symbol="uhf_rfid",
 )

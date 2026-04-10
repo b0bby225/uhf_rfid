@@ -91,11 +91,14 @@ UHFData* uhf_response_data_get_uhf_data(UHFResponseData* uhf_response_data, uint
 }
 
 void uhf_response_data_reset(UHFResponseData* uhf_response_data) {
+    /* Bug fix: uhf_data_reset(head) sets head->next = NULL, so the chain
+     * after head would be lost before uhf_data_free can walk it.
+     * Save the tail of the chain FIRST, then reset the head, then free. */
+    UHFData* extra = (uhf_response_data->size > 1) ? uhf_response_data->head->next : NULL;
     uhf_data_reset(uhf_response_data->head);
-    if(uhf_response_data->size == 1) {
-        return;
+    if(extra) {
+        uhf_data_free(extra);
     }
-    uhf_data_free(uhf_response_data->head->next);
     uhf_response_data->size = 1;
 }
 
@@ -106,6 +109,9 @@ void uhf_response_data_free(UHFResponseData* uhf_response_data) {
 
 UHFTag* uhf_tag_alloc() {
     UHFTag* uhf_tag = (UHFTag*)malloc(sizeof(UHFTag));
+    /* Zero-initialize so epc_length/tid_length/user_length start at 0,
+     * preventing size_t underflow in callers that check before uhf_tag_reset. */
+    if(uhf_tag) memset(uhf_tag, 0, sizeof(UHFTag));
     return uhf_tag;
 }
 

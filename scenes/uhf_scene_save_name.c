@@ -1,7 +1,12 @@
 #include "../uhf_app_i.h"
-#include <lib/toolbox/random_name.h>
 #include <gui/modules/validators.h>
 #include <toolbox/path.h>
+
+/* random_name.h was removed from the public SDK; provide a local substitute */
+static void set_random_name(char* name, size_t n) {
+    uint32_t r = furi_hal_random_get();
+    snprintf(name, n, "Tag_%08lX", (unsigned long)r);
+}
 
 void uhf_scene_save_name_text_input_callback(void* context) {
     UHFApp* uhf_app = context;

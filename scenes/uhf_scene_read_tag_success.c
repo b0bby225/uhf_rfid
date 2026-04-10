@@ -39,7 +39,11 @@ void uhf_scene_read_tag_success_on_enter(void* ctx) {
     widget_add_string_element(uhf_app->widget, 26, 19, AlignLeft, AlignCenter, FontKeyboard, pc);
     char* crc = convertToHexString(uhf_tag->crc, 2);
     widget_add_string_element(uhf_app->widget, 96, 19, AlignLeft, AlignCenter, FontKeyboard, crc);
-    char* epc = convertToHexString(uhf_tag->epc + 2, uhf_tag->epc_length - 2);
+    /* Guard: epc_length must be > 2 (at least 1 EPC byte beyond the 2-byte PC prefix).
+     * If read failed or length is wrong, epc_length - 2 would underflow (size_t wrap
+     * to ~4 billion), causing convertToHexString to loop until OOM. */
+    size_t epc_display_len = (uhf_tag->epc_length > 2) ? (uhf_tag->epc_length - 2) : 0;
+    char* epc = convertToHexString(uhf_tag->epc + 2, epc_display_len);
     widget_add_string_multiline_element(
         uhf_app->widget, 34, 29, AlignLeft, AlignTop, FontKeyboard, epc);
     widget_add_button_element(

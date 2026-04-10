@@ -1,144 +1,105 @@
-# [UHF]RFID App for FlipperZero
+# UHF RFID — Flipper Zero App
 
-![FlipperZero](assets/img/uhf_demo_app.jpg)
-
-## Overview
-
-This repository contains a UHF RFID application developed for FlipperZero, a versatile multi-tool device. The app leverages the YRM100 module to enable UHF RFID functionality.
+Read, write, and manage UHF RFID tags (EPC Gen2 / ISO 18000-6C) using the YRM100 module on a Flipper Zero.
 
 ## Features
 
-- [x] Read Single UHF RFID tag.
-- [x] View saved UHF RFID tag.
-- [x] Write Single UHF RFID tag. __(Beta)__ Branch: [write_tag commit#32bc411](https://github.com/frux-c/uhf_rfid/commit/32bc4114c707b128db91ab01b2f49d0cb852d257)
-- [ ] Change Module setting parameters.
-- [ ] Easy-to-use interface on FlipperZero's display.
-    - Extras
-        - [ ] Read multiple tags at once
-        - [ ] View multiple on a list view
+- **Read Tag** — Single-poll EPC read with full tag detail view (EPC, TID, User, RSSI)
+- **View EPC as QR Code** — Renders the scanned EPC as a scannable QR code on-screen
+- **Write Tag Banks** — Hex byte-editor input for EPC (12 B), TID (12 B), User (8 B), and RFU (4 B)
+- **Set Access Password** — Write a 32-bit access password with byte-accurate hex editor
+- **Set Kill Password** — Write a 32-bit kill password using the same hex editor flow
+- **Kill Tag** — Permanently disable (kill) a tag using its stored kill password
+- **Bulk Scan** — Continuously poll and log unique tag EPCs to SD card (`/ext/uhf_bulk_scan.txt`)
+- **Saved Tags** — Browse and load previously saved tag files from SD card
+- **Settings** — Inline Left/Right adjustment for Baudrate, TX Power, and Region without leaving the menu
+- **Kill PW Audit** 🚧 — Brute-force kill-password auditing tool *(in development — not functional)*
 
 ## Requirements
 
-To run this application on FlipperZero, you will need:
+- **Flipper Zero** (firmware 0.99+ recommended)
+- **YRM100 UHF RFID Module** — [AliExpress listing](https://www.aliexpress.com/item/1005005296512846.html)
+- **Wiring**: TX → pin 13, RX → pin 14, VCC → 5V (pin 1), GND → pin 8
 
-- FlipperZero device (purchase from [Flipper Devices](https://www.flipperdevices.com))
-- YRM100 UHF RFID module (purchase from [Ali-Express](https://www.aliexpress.com/item/1005005296512846.html))
+  ![YRM100 wiring](https://static-cdn.m5stack.com/resource/docs/products/unit/uhf_rfid/uhf_rfid_sch_01.webp)
 
-## Setup and Installation
+## Installation
 
-1. Ensure you have set up your FlipperZero device with the YRM100 module properly. You can also read more about how to setup the module from the [Md5Stack Docs page](http://docs.m5stack.com/en/unit/uhf_rfid).
-   ![wiring diagram](https://static-cdn.m5stack.com/resource/docs/products/unit/uhf_rfid/uhf_rfid_sch_01.webp)
-2. Clone this repository to the `applications_user` folder of your flipper firmware of your choice
-3. If you have VSCode setup with your flipper firmware.
-   - ### Windows
-     1. Press `Ctrl+Shift+B` on vscode while in the uhf_app folder
-     2. Select the `Launch App on Flipper` option. And watch as the app launches on your flipper
-     - If you don't have vscode setup you can use the cli command `./fbt COMPACT=1 DEBUG=0 launch APPSRC=applications_user\uhf_rfid`
-   - ### MacOS
-     ... tbd
+### Quick Download (Recommended)
+
+**Download**: [uhf_rfid.fap](dist/uhf_rfid.fap)
+
+#### Steps
+1. Download `uhf_rfid.fap`
+2. Copy to your Flipper SD card: `SD Card/apps/RFID/uhf_rfid.fap`
+3. Eject / unmount the SD card and reinsert — the app will appear under **Applications → RFID**
+
+### Method 2: Build from Source
+
+```bash
+# Install ufbt
+pip install ufbt
+
+# Clone and build
+git clone https://github.com/b0bby225/uhf_rfid.git
+cd uhf_rfid
+ufbt
+```
+
+The compiled `.fap` will appear in `dist/uhf_rfid.fap`. Copy it to `SD Card/apps/RFID/` on your Flipper.
+
+> **Note:** Do **not** use `ufbt flash_usb` — that updates the Flipper firmware, not just the app.
+
+## Controls
+
+| Screen | Button | Action |
+|---|---|---|
+| **Main Menu** | Up / Down | Navigate items |
+| **Main Menu** | OK | Select item |
+| **Settings** | Up / Down | Navigate rows |
+| **Settings** | Left / Right | Adjust value inline |
+| **Settings** | OK | Apply highlighted setting |
+| **Byte Editor** | Left / Right | Move cursor |
+| **Byte Editor** | Up / Down | Change nibble value |
+| **Byte Editor** | OK | Confirm entry |
+| **Tag Detail / QR** | Back | Return to Tag Menu |
+| **Any popup** | Back | Cancel / return |
 
 ## Usage
 
-1. Power on your FlipperZero device.
-2. Connect the uhf module to the flipper via gpio.
-3. Navigate to the UHF RFID app on FlipperZero's menu.
-4. Currently Reading the EPC tag is the only usable option
-... will further update this page as it development goes
+1. Wire the YRM100 module to the Flipper GPIO header (see wiring above)
+2. Open **[UHF]RFID** from Applications → RFID
+3. The app will verify the module connection on launch
+4. **Read Tag** — Present a tag to the module; tag data displays after a successful read
+5. From the Tag Menu you can write banks, set passwords, kill the tag, or view the EPC as a QR code
+6. **Bulk Scan** — Continuously logs each unique tag EPC to `/ext/uhf_bulk_scan.txt`
+7. **Settings** — Adjust baud rate, TX power, and region directly with Left/Right arrows; press OK to apply
 
-## Contributions
+## Feature Status
 
-As this app is still in the development stage, I welcome contributions to this project. If you find any issues or want to enhance the application, feel free to create a pull request.
+| Feature | Status |
+|---|---|
+| Read Tag | Stable |
+| Write Tag Banks (EPC / TID / User / RFU) | Stable |
+| Set Access / Kill Password | Stable |
+| Kill Tag | Stable |
+| Bulk Scan | Stable |
+| QR Code View | Stable |
+| Saved Tags | Stable |
+| Settings (Baud / Power / Region) | Stable |
+| Kill PW Audit | In Development |
 
-<!-- ## License
+## Protocol Reference
 
-This project is licensed under the [MIT License](link_to_license_file). -->
+The YRM100 module uses the MagicRF M100 command set over UART.
+Full firmware manual: [MagicRF_M100_Firmware_manual_en.pdf](assets/res/MagicRF_M100&QM100_Firmware_manual_en.pdf)
 
-## Future Plans
-- Code cleanup
-- Build a framework around the chip communication commands
-- Build a proper tag class
-```c
-// Ideal concept
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+## License
 
-typedef struct {
-    int uart_fd; // UART file descriptor or other identifier
-} YRM100_RFID;
+MIT License — original app by [frux-c](https://github.com/frux-c/uhf_rfid). Extended by Bobby Gibbs.
 
-void sendCommand(YRM100_RFID *rfid, const uint8_t *command, size_t length) {
-    // Implementation to send the command through UART
-    // Write the command to the UART interface using rfid->uart_fd
-}
+## Author
 
-// Configuration functions:
+Bobby Gibbs ([@b0bby225](https://github.com/b0bby225))
 
-void setCommunicationBaudRate(YRM100_RFID *rfid) {
-    uint8_t command[] = {0xBB, 0x00, 0x11, 0x00, 0x02, 0x00, 0xC0, 0xD3, 0x7E};
-    sendCommand(rfid, command, sizeof(command));
-}
-
-void setWorkingArea(YRM100_RFID *rfid, uint8_t area) {
-    uint8_t command[] = {0xBB, 0x00, 0x07, 0x00, 0x01, area, 0x09, 0x7E}; 
-    sendCommand(rfid, command, sizeof(command));
-}
-
-// other method etc ... 
-```
-
-```c
-// Ideal concept
-#include <stdint.h>
-#include <stdlib.h>
-
-typedef struct {
-    uint8_t *killPassword;
-    uint8_t *accessPassword;
-    size_t size;
-} ReservedMemory;
-
-typedef struct {
-    uint8_t *header;
-    uint8_t *filter;
-    uint8_t *partition;
-    uint8_t *companyPrefix;
-    uint8_t *itemReference;
-    size_t size;
-} EPCMemory;
-
-typedef struct {
-    uint8_t *tid;
-    size_t size;
-} TIDMemory;
-
-typedef struct {
-    uint8_t *userMemory;
-    size_t size;
-} UserMemory;
-
-typedef struct {
-    ReservedMemory reserved;
-    EPCMemory epc;
-    TIDMemory tid;
-    UserMemory user;
-} ISO18000_6C_Tag;
-```
-
-## Disclaimer
-
-- This application is provided as-is and may contain bugs or issues.
-- Use it at your own risk.
-- I am not responsible for any damage or loss caused by the usage of this app.
-
-## Extra Resources
-
-- [MagicRF M100&QM100_Firmware_manual_en.pdf](assets/res/MagicRF_M100&QM100_Firmware_manual_en.pdf)
-
-## Contact
-
-For any inquiries or support, you can reach out to us at :
-
-- Personal Email : [frux.infoc@gmail.com](mailto:frux.infoc@gmail.com)
-- Discord Server: [Flipper Zero Tutorial-Unoffical by @jamisonderek](https://discord.gg/REunuAnTX9)
-- Discord User: [frux.c]()
+---
