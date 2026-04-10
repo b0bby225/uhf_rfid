@@ -48,8 +48,6 @@ ufbt
 
 The compiled `.fap` will appear in `dist/uhf_rfid.fap`. Copy it to `SD Card/apps/RFID/` on your Flipper.
 
-> **Note:** Do **not** use `ufbt flash_usb` — that updates the Flipper firmware, not just the app.
-
 ## Controls
 
 | Screen | Button | Action |
@@ -82,7 +80,7 @@ The compiled `.fap` will appear in `dist/uhf_rfid.fap`. Copy it to `SD Card/apps
 | Read Tag | Stable |
 | Write Tag Banks (EPC / TID / User / RFU) | Stable |
 | Set Access / Kill Password | Stable |
-| Kill Tag | Stable |
+| Kill Tag | In Development |
 | Bulk Scan | Stable |
 | QR Code View | Stable |
 | Saved Tags | Stable |
